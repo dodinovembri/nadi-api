@@ -1,68 +1,34 @@
 const { json } = require("body-parser");
 const pool = require("../configs/connection");
 
-const getBlogs = (request, response) => {
-  pool.query('SELECT * FROM blog ORDER BY id ASC', (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-}
+const getPageInformation = (request, response) => {
 
-const getBlogById = (request, response) => {
-  const id = parseInt(request.params.id)
+  const companyId = String(request.params.id);
+  const languageCode = 'en';
+  const slug = 'home';
   
-  pool.query('SELECT * FROM Blogs WHERE id = $1', [id], (error, results) => {
+  pool.query("SELECT public.nadi_get_blog_page_information($1, $2, $3)", [companyId, slug, languageCode], (error, results) => {
     if (error) {
       throw error
     }
-    response.status(200).json(results.rows)
+    response.status(200).json(results.rows[0])
   })
 }
 
-const createBlog = (request, response) => {
-  const { name, email } = request.body
+const getBlogContainer = (request, response) => {
 
-  pool.query('INSERT INTO Blogs (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
+  const companyId = String(request.params.id);
+  const languageCode = 'en';
+  
+  pool.query("SELECT public.nadi_get_blog_template($1, $2)", [companyId, languageCode], (error, results) => {
     if (error) {
       throw error
     }
-    response.status(201).send(`Blog added with ID: ${results.insertId}`)
-  })
-}
-
-const updateBlog = (request, response) => {
-  const id = parseInt(request.params.id)
-  const { name, email } = request.body
-
-  pool.query(
-    'UPDATE Blogs SET name = $1, email = $2 WHERE id = $3',
-    [name, email, id],
-    (error, results) => {
-      if (error) {
-        throw error
-      }
-      response.status(200).send(`Blog modified with ID: ${id}`)
-    }
-  )
-}
-
-const deleteBlog = (request, response) => {
-  const id = parseInt(request.params.id)
-
-  pool.query('DELETE FROM Blogs WHERE id = $1', [id], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).send(`Blog deleted with ID: ${id}`)
+    response.status(200).json(results.rows[0])
   })
 }
 
 module.exports = {
-  getBlogs,
-  getBlogById,
-  createBlog,
-  updateBlog,
-  deleteBlog,
+  getPageInformation,
+  getBlogContainer
 }

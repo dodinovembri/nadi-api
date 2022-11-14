@@ -8,15 +8,11 @@ var app = express();
 /**
  * start routes application
  */
-const page = require('./controllers/pageController');
+const page = require('./controllers/blogController');
 // page information
 app.get('/page_information/:id', page.getPageInformation);
-// page
-app.get('/page_container/:id', page.getPageContainer);
-
-//blog
-const blog = require('./controllers/blogController')
-app.get('/blog/:id', blog.getBlogs);
+// blog container
+app.get('/blog-template/:id', page.getBlogContainer);
 /**
  * End routes application
  */
